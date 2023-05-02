@@ -46,13 +46,6 @@ TaxationService.findOne = async (uuid) => {
         taxationsData.dataValues.taxes = await ClientTaxService.findAll(taxationsData.dataValues.uuid);
         taxationsData.dataValues.payments = payments;
     }
-    // for (let index = 0; index < taxationsData.length; index++) {
-    //     let clients = await ClientService.findOne(taxationsData[index].dataValues.client_uuid);
-    //     let payments = await PaymentService.findAll(taxationsData[index].dataValues.uuid);
-    //     taxationsData[index].dataValues.client = clients[0];
-    //     taxationsData[index].dataValues.taxes = await ClientTaxService.findAll(taxationsData[index].dataValues.uuid);
-    //     taxationsData[index].dataValues.payments = payments;
-    // }
     return taxationsData ?? {};
 }
 
