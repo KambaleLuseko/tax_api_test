@@ -14,9 +14,9 @@ AdminDashboardService.getWeeklyData = async (value) => {
         return d.toISOString().substring(0, 10)
     })
 
-    let goodClientStats = await connexion.query(`SELECT MAX(taxations.totalAmount) totalTaxation, (SELECT clients.fullname FROM clients WHERE clients.uuid=taxations.client_uuid) clientName from taxations WHERE (SELECT SUM(payments.totalAmount) FROM payments WHERE payments.taxation_uuid=taxations.uuid)-taxations.totalAmount=0  GROUP BY taxations.client_uuid ORDER BY MAX(taxations.totalAmount) DESC LIMIT 5`, { type: QueryTypes.SELECT });
+    let goodClientStats = await connexion.query(`SELECT MAX(taxations.totalAmount) totalTaxation, (SELECT clients.fullname FROM clients WHERE clients.uuid=taxations.client_uuid) clientName from taxations WHERE (SELECT SUM(payments.totalAmount) FROM payments WHERE payments.taxation_uuid=taxations.uuid)-taxations.totalAmount=0 GROUP BY taxations.client_uuid LIMIT 5`, { type: QueryTypes.SELECT });
 
-    let badClientStats = await connexion.query(`SELECT MAX(taxations.totalAmount) totalTaxation, (SELECT clients.fullname FROM clients WHERE clients.uuid=taxations.client_uuid) clientName from taxations WHERE taxations.totalAmount>IFNULL((SELECT SUM(payments.totalAmount) FROM payments WHERE payments.taxation_uuid=taxations.uuid),0)  GROUP BY taxations.client_uuid DESC LIMIT 5`, { type: QueryTypes.SELECT });
+    let badClientStats = await connexion.query(`SELECT MAX(taxations.totalAmount) totalTaxation, (SELECT clients.fullname FROM clients WHERE clients.uuid=taxations.client_uuid) clientName from taxations WHERE taxations.totalAmount>IFNULL((SELECT SUM(payments.totalAmount) FROM payments WHERE payments.taxation_uuid=taxations.uuid),0)  GROUP BY taxations.client_uuid LIMIT 5`, { type: QueryTypes.SELECT });
     return { weekStats: groupData, goodClients: goodClientStats, badClients: badClientStats }
 }
 

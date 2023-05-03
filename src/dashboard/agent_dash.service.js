@@ -2,7 +2,7 @@ const { QueryTypes } = require('sequelize');
 const { connexion } = require('../config/dbconfig.provider')
 const AgentDashboardService = {}
 AgentDashboardService.getWeeklyData = async (accountUUID) => {
-    let weeklyStats = await connexion.query(`SELECT SUBSTR(taxations.createdAt, 1,10) date, taxations.totalAmount totalTaxation,(SELECT SUM(payments.totalAmount) FROM payments WHERE payments.taxation_uuid=taxations.uuid) totalPayment from taxations WHERE createdAt BETWEEN DATE_SUB(NOW(), INTERVAL 7 DAY) AND NOW() AND taxations.accountUUID='20230425120800112'`, { type: QueryTypes.SELECT });
+    let weeklyStats = await connexion.query(`SELECT SUBSTR(taxations.createdAt, 1,10) date, taxations.totalAmount totalTaxation,(SELECT SUM(payments.totalAmount) FROM payments WHERE payments.taxation_uuid=taxations.uuid) totalPayment from taxations WHERE createdAt BETWEEN DATE_SUB(NOW(), INTERVAL 7 DAY) AND NOW() AND taxations.accountUUID='${accountUUID}'`, { type: QueryTypes.SELECT });
     let groupData = [];
 
     const dates = [...Array(7)].map((_, i) => {

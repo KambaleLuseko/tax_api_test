@@ -13,11 +13,11 @@ TaxService.findAll = async (value, getSpecs = true) => {
     }
     let data = await taxes.findAll(value ? { where: condition } : {});
     // let data = await divisions.findAll(searchValue ? { where: condition } : {});
-    if (getSpecs.toString() == 'true') {
-        for (let index = 0; index < data.length; index++) {
-            data[index].dataValues.inputs = await TaxeInputsService.findAll(data[index].dataValues.id);
-        }
-    }
+    // if (getSpecs.toString() == 'true') {
+    //     for (let index = 0; index < data.length; index++) {
+    //         data[index].dataValues.inputs = await TaxeInputsService.findAll(data[index].dataValues.id);
+    //     }
+    // }
 
     return data;
 }

@@ -8,7 +8,11 @@ DashboardController.getStats = async (req, res) => {
 }
 
 DashboardController.getWeeklyData = async (req, res) => {
-    res.status(200).send({ data: await AgentDashboardService.getWeeklyData(), message: "Success" })
+    if (!req.params.uuid) {
+        res.status(400).send({ data: [], message: "Unable to find requested data" });
+        return;
+    }
+    res.status(200).send({ data: await AgentDashboardService.getWeeklyData(req.params.uuid), message: "Success" })
 }
 
 module.exports = DashboardController;
