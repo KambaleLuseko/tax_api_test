@@ -15,4 +15,9 @@ DashboardController.getWeeklyData = async (req, res) => {
     res.status(200).send({ data: await AgentDashboardService.getWeeklyData(req.params.uuid), message: "Success" })
 }
 
+DashboardController.getPayment = async (req, res) => {
+
+    res.status(200).send({ data: await AdminDashboardService.getDataPerUser(), message: "Success" })
+}
+
 module.exports = DashboardController;

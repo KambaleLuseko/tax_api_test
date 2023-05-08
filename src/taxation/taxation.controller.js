@@ -29,6 +29,14 @@ TaxationController.findOne = async (req, res) => {
     res.status(200).send({ data: response });
 }
 
+TaxationController.findByClient = async (req, res) => {
+    if (!req.params.uuid) {
+        return res.status(404).send({ data: [], message: "Unable to find the requested data" });
+    }
+    let response = await TaxationService.clientDebt(req.params.uuid);
+    res.status(200).send({ data: response });
+}
+
 TaxationController.sync = async (req, res) => {
     if (!req.body) {
         return res.status(400).send({ data: [], message: "Invalid data submitted" });
