@@ -52,6 +52,30 @@ ExpenseCategoryService.create = async (data) => {
     }
 }
 
+ExpenseCategoryService.update = async (data, uuid) => {
+    if (!uuid) {
+        return { status: 400, data: [], message: "Nous ne parvenons pas à trouver l'élément recherché" };
+    }
+    if (!uuid || !data.name) {
+        return { status: 400, data: [], message: "Invalid data submitted" };
+    }
+    let checkExpense = await expenseCategories.findAll({ where: { name: data.name, uuid: { [Op.ne]: uuid } } });
+    if (checkExpense.length > 0) {
+        return { status: 403, data: [], message: "Thix expense category already exists" };
+    }
+    let dataToSave = {
+        name: data.name,
+        description: data.description,
+    }
+    try {
+        let response = await expenseCategories.update(dataToSave, { where: { uuid: uuid } });
+        return { status: 200, data: response, message: "Data saved" };
+    } catch (error) {
+        console.log(error.message);
+        return { status: 500, data: [], message: "Error occured" };
+    }
+}
+
 
 
 module.exports = ExpenseCategoryService;

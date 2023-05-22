@@ -3,6 +3,10 @@ const ClosingService = require("./closing.service")
 const ClosingController = {}
 
 ClosingController.findAll = async (req, res) => {
+    if (req.params.value && req.params.value.toString().toLowerCase() == 'admin') {
+        res.status(200).send({ data: await ClosingService.findAllForAdmin(), message: "Success" });
+        return;
+    }
     res.status(200).send({ data: await ClosingService.findAll(req.params.value), message: "Success" });
 }
 ClosingController.create = async (req, res) => {

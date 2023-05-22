@@ -40,6 +40,14 @@ module.exports = (sequelize, Sequelize) => {
             allowNull: true,
             defaultValue: 1
         },
+        activity: {
+            type: Sequelize.TEXT,
+            allowNull: true,
+        },
+        radius_group_uuid: {
+            type: Sequelize.STRING,
+            allowNull: true,
+        },
     });
     return clientModel;
 }

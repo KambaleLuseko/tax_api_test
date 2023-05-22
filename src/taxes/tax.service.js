@@ -26,7 +26,7 @@ TaxService.create = async (data) => {
     if (!data.division_id || !data.name || !data.cycle || !data.periode) {
         return { status: 400, data: [], message: "Invalid data submitted" };
     }
-    if ((!data.montant_du && !data.pourcentage) || parseFloat(data.montant_du.toString()) <= 0 && parseFloat(data.pourcentage.toString()) <= 0) {
+    if ((!data.montant_du && !data.pourcentage) || (parseFloat(data.montant_du.toString()) <= 0 && parseFloat(data.pourcentage.toString()) <= 0)) {
         return { status: 400, data: [], message: "Please, specify either amount or percentage" };
     }
     let checkTaxe = await taxes.findAll({ where: { name: data.name, division_id: data.division_id } });
@@ -59,10 +59,13 @@ TaxService.update = async (data, id) => {
         return { status: 403, data: [], message: "Invalid data submitted" };
     }
 
-    if ((!data.montant_du && !data.pourcentage) || parseFloat(data.montant_du.toString()) <= 0 || parseFloat(data.pourcentage.toString()) <= 0) {
+    if ((!data.montant_du && !data.pourcentage) || (parseFloat(data.montant_du.toString()) <= 0 && parseFloat(data.pourcentage.toString()) <= 0)) {
         return { status: 403, data: [], message: "Please, specify either amount or percentage" };
     }
-
+    let checkDuplication = await taxes.findAll({ where: { name: data.name, id: { [Op.ne]: id } } });
+    if (checkDuplication.length > 0) {
+        return { status: 403, data: [], message: "Cette taxe existe déjà dans le système" };
+    }
     let tax = {
         division_id: data.division_id,
         name: data.name,

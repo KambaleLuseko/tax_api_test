@@ -1,6 +1,7 @@
 const { Op } = require("sequelize");
 const { accounts } = require("../config/dbconfig.provider");
 const uuidGenerator = require("../Helpers/uuidGenerator");
+const checkAccountStatus = require("../Helpers/checkAccountStatus");
 
 const AccountService = {};
 
@@ -46,7 +47,10 @@ AccountService.create = async (data) => {
 
 
 AccountService.updateBalance = async (amount, transaction, id) => {
-
+    let closing = await checkAccountStatus(id);
+    if (closing == false) {
+        return { status: 401, message: "Ce compte n'existe pas dans le système ou il a été désactivé", data: [] };
+    }
     if (!amount || !transaction || !id) {
         return { status: 401, data: [], message: 'Invalid account data submitted' };
     }
@@ -76,6 +80,14 @@ AccountService.updateBalance = async (amount, transaction, id) => {
         return { status: 400, data: [], message: 'Error occured while updating balance' };
     }
 
+}
+
+AccountService.checkAccount = async (accountUUID) => {
+    let closing = await accounts.findOne({ where: { uuid: accountUUID, active: 1 } });
+    if (closing) {
+        return true;
+    }
+    return false;
 }
 
 module.exports = AccountService;

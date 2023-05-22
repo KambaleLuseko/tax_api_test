@@ -19,4 +19,9 @@ router.put('/:id', async (req, res) => {
     res.status(user.status).send({ data, message } = user);
 });
 
+router.put('/password/:id', async (req, res) => {
+    let user = await UserService.updatePassword(req.body, req.params.id);
+    res.status(user.status).send({ data, message } = user);
+});
+
 module.exports = router;

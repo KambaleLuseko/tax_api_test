@@ -31,6 +31,10 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.INTEGER,
             allowNull: true,
         },
+        radius_group_uuid: {
+            type: Sequelize.STRING,
+            allowNull: true,
+        },
     });
     return UserModel;
 }

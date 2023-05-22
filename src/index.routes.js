@@ -12,6 +12,7 @@ router.use('/expense-categories', require('./expense_category/expense_category.r
 router.use('/expenses', require('./expenses/expense.route'));
 router.use('/accounts', require('./accounts/account.route'));
 router.use('/closings', require('./closing/closing.route'));
+router.use('/radius-group', require('./radius_group/radius_group.route'));
 router.use('/overdue-fees', require('./overduesFees/overdue_fees.route'));
 router.use('/stats', require('./dashboard/dashboard.route'));
 

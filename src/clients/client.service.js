@@ -1,5 +1,5 @@
-const { Op } = require("sequelize");
-const { clients } = require("../config/dbconfig.provider");
+const { Op, QueryTypes } = require("sequelize");
+const { clients, connexion } = require("../config/dbconfig.provider");
 const uuidGenerator = require('../Helpers/uuidGenerator');
 
 const ClientService = {};
@@ -9,11 +9,17 @@ ClientService.findAll = async (value) => {
     if (value != null) {
         condition = { [Op.or]: { uuid: value, phone: value } };
     }
-    let data = await clients.findAll(value != null ? { where: condition } : {});
+    let data = await connexion.query(`SELECT clients.*, radius_groups.name radiusName FROM clients LEFT JOIN radius_groups ON radius_groups.uuid=clients.radius_group_uuid`, { type: QueryTypes.SELECT });
+
+    // await clients.findAll(value != null ? { where: condition } : {});
     return data;
 }
 
 ClientService.create = async (data) => {
+
+    if (!data.fullname || !data.phone) {
+        return { status: 400, data: [], message: "Invalid data submitted" };
+    }
     let client = {
         "uuid": data.uuid ?? uuidGenerator(),
         "fullname": data.fullname,
@@ -23,14 +29,50 @@ ClientService.create = async (data) => {
         "impotID": data.impotID,
         "syncStatus": data.syncStatus || 1,
         "postalCode": data.postalCode,
+        "activity": data.activity,
+        "radius_group_uuid": data.radius_group_uuid,
     }
-    if (!client.fullname || !client.phone) {
-        return { status: 400, data: [], message: "Invalid data submitted" };
+    let checkDuplication = await clients.findAll({ where: { [Op.or]: { fullname: data.fullname, phone: data.phone } } });
+    if (checkDuplication.length > 0) {
+        return { status: 400, data: [], message: "Ce nom ou numéro de téléphone existe dans le système" };
     }
     try {
         let savedData = await clients.create(client);
         return { status: 200, data: savedData, message: "Data saved" };
     } catch (error) {
+        return { status: 400, data: [], message: "Error occured while saving data" };
+    }
+
+}
+
+ClientService.update = async (data, uuid) => {
+    if (!uuid) {
+        return { status: 400, data: [], message: "Unable to find requested data" };
+    }
+    if (!data.fullname || !data.phone) {
+        return { status: 400, data: [], message: "Invalid data submitted" };
+    }
+    let client = {
+        "fullname": data.fullname,
+        "phone": data.phone,
+        "email": data.email,
+        "nationalID": data.nationalID,
+        "impotID": data.impotID,
+        "syncStatus": data.syncStatus || 1,
+        "postalCode": data.postalCode,
+        "activity": data.activity,
+        "radius_group_uuid": data.radius_group_uuid,
+    }
+    let checkDuplication = await clients.findAll({ where: { [Op.and]: { [Op.or]: { fullname: data.fullname, phone: data.phone }, uuid: { [Op.ne]: uuid } }, } });
+    if (checkDuplication.length > 0) {
+        return { status: 400, data: [], message: "Ce nom ou numéro de téléphone existe dans le système" };
+
+    }
+    try {
+        let savedData = await clients.update(client, { where: { uuid: uuid } });
+        return { status: 200, data: savedData, message: "Data saved" };
+    } catch (error) {
+        // console.log(error.message);
         return { status: 400, data: [], message: "Error occured while saving data" };
     }
 
@@ -47,6 +89,11 @@ ClientService.sync = async (data) => {
         if (!client.fullname || !client.phone) {
             hasErrors = true;
         }
+        let checkDuplication = await clients.findAll({ where: { [Op.or]: { fullname: data.fullname, phone: data.phone } } });
+        if (checkDuplication.length > 0) {
+            hasErrors = true;
+            continue;
+        }
         dataToSave.push({
             "uuid": client.uuid ?? uuidGenerator(),
             "fullname": client.fullname,
@@ -56,10 +103,12 @@ ClientService.sync = async (data) => {
             "impotID": client.impotID,
             "syncStatus": client.syncStatus || 1,
             "postalCode": client.postalCode,
+            "activity": client.activity,
+            "radius_group_uuid": client.radius_group_uuid,
         });
     }
     if (hasErrors == true) {
-        return { status: 400, data: [], message: "Some submitted data are invalid" };
+        return { status: 400, data: [], message: "Certaines données des clients existent deja et ne peuvent être enregistrées" };
     }
     try {
         await clients.bulkCreate(dataToSave);

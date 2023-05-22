@@ -3,6 +3,6 @@ const router = require('express').Router();
 
 router.get('/', DivisionController.findAll);
 router.post('/', DivisionController.create);
-router.put('/', DivisionController.update);
+router.put('/:uuid', DivisionController.update);
 
 module.exports = router;

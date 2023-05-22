@@ -93,8 +93,8 @@ TaxationService.create = async (data) => {
         return { status: 400, data: [], message: "Invalid declaration data submitted" };
     }
     let closing = await checkAccountStatus(data.accountUUID);
-    if (closing == true) {
-        return { status: 401, message: "This account is already closed", data: [] };
+    if (closing == false) {
+        return { status: 401, message: "Ce compte n'existe pas dans le système ou il a été désactivé", data: [] };
     }
     let saveTaxation = {
         accountUUID: data.accountUUID,

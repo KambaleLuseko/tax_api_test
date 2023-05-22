@@ -9,6 +9,7 @@ const TaxationService = require("../taxation/taxation.service")
 const accountModel = require("../accounts/account.model")
 const userModel = require("../users/user.model")
 const UserService = require("../users/user.service")
+const checkAccountStatus = require("../Helpers/checkAccountStatus")
 
 
 const ClosingService = {}
@@ -31,13 +32,36 @@ ClosingService.findAll = async (value) => {
     return response;
 }
 
+ClosingService.findAllForAdmin = async () => {
+
+
+    let response = await closings.findAll({
+        where: { [Op.or]: { status: 'validated', status: 'Validated' } }
+    });
+    for (let index = 0; index < response.length; index++) {
+        let sender = await UserService.findAll(response[index].dataValues.sender_account_uuid);
+        let receiver = await UserService.findAll(response[index].dataValues.receiver_account_uuid);
+        response[index].dataValues.sender = sender.length > 0 ? sender[0] : null;
+        response[index].dataValues.receiver = receiver.length > 0 ? receiver[0] : null;
+    }
+    return response;
+}
+
 ClosingService.create = async (data) => {
     if (!data.sender_account_uuid || !data.receiver_account_uuid || !data.montant_cloture) {
         return { status: 403, data: [], message: "Invalid data submitted" };
     }
+    let senderStat = await checkAccountStatus(data.sender_account_uuid);
+    if (senderStat == false) {
+        return { status: 401, message: "Le compte expéditaire n'existe pas dans le système ou il a été désactivé", data: [] };
+    }
+    let receiverStat = await checkAccountStatus(data.receiver_account_uuid);
+    if (receiverStat == false) {
+        return { status: 401, message: "Le compte bénéficiaire n'existe pas dans le système ou il a été désactivé", data: [] };
+    }
     let closingStatus = await ClosingService.checkAccountClosing(data.sender_account_uuid);
     if (closingStatus == true) {
-        return { status: 401, message: "This account is already closed", data: [] };
+        return { status: 401, message: "Un autre transfert est en attente. Veuillez l'annuler avant de créer un nouveau transfert", data: [] };
     }
     if (!parseFloat(data.montant_cloture) || parseFloat(data.montant_cloture) <= 0) {
         return { status: 403, data: [], message: "Invalid amount submitted" };
@@ -161,10 +185,11 @@ ClosingService.getClosingData = async (date, accountUUID) => {
 }
 
 ClosingService.checkAccountClosing = async (accountUUID) => {
-    // let closing = await closings.findAll({ where: { date_send: { [Op.substring]: dateFormator().toString().substring(0, 10) }, sender_account_uuid: accountUUID } });
-    // if (closing.length > 0) {
-    //     return true;
-    // }
+
+    let closing = await closings.findAll({ where: { status: "pending", sender_account_uuid: accountUUID } });
+    if (closing.length > 0) {
+        return true;
+    }
     return false;
 }
 

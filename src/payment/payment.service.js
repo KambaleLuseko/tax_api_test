@@ -16,8 +16,8 @@ PaymentService.create = async (data) => {
     }
     try {
         let closing = await checkAccountStatus(data.accountUUID);
-        if (closing.toString() == 'true') {
-            return { status: 401, message: "This account is already closed", data: [] };
+        if (closing == false) {
+            return { status: 401, message: "Ce compte n'existe pas dans le système ou il a été désactivé", data: [] };
         }
         if (data.uuid) {
             let checkPayment = await payments.findAll({ where: { uuid: data.uuid } });

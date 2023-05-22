@@ -20,6 +20,14 @@ ExpenseCategoryController.create = async (req, res) => {
     res.status(response.status).send({ data, message } = response);
 }
 
+ExpenseCategoryController.update = async (req, res) => {
+    if (!req.body || !req.params.uuid) {
+        return res.status(400).send({ data: [], message: "Invalid data submitted" });
+    }
+    let response = await ExpenseCategoryService.update(req.body, req.params.uuid);
+    res.status(response.status).send({ data, message } = response);
+}
+
 ExpenseCategoryController.findOne = async (req, res) => {
     if (!req.params.uuid) {
         return res.status(400).send({ data: [], message: "Invalid data submitted" });
