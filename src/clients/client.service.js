@@ -15,6 +15,20 @@ ClientService.findAll = async (value) => {
     return data;
 }
 
+ClientService.findOne = async (value) => {
+    if (!value) {
+        return {}
+    }
+    let data = await connexion.query(`SELECT clients.*, radius_groups.name radiusName FROM clients LEFT JOIN radius_groups ON radius_groups.uuid=clients.radius_group_uuid WHERE clients.uuid=${value}`, { type: QueryTypes.SELECT });
+    // console.log(data);
+    // await clients.findAll(value != null ? { where: condition } : {});
+    try {
+        return data[0];
+    } catch (error) {
+        return null;
+    }
+}
+
 ClientService.create = async (data) => {
 
     if (!data.fullname || !data.phone) {

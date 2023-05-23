@@ -7,6 +7,11 @@ TaxController.findAll = async (req, res) => {
     res.status(200).send({ data: data });
 }
 
+TaxController.findOne = async (req, res) => {
+    let data = await TaxService.findOne(req.params.value);
+    res.status(200).send({ data: data });
+}
+
 TaxController.create = async (req, res) => {
     let data = await TaxService.create(req.body);
     res.status(data.status).send({ data, message } = data);

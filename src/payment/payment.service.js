@@ -2,8 +2,6 @@ const { Op } = require("sequelize");
 const uuidGenerator = require("../Helpers/uuidGenerator");
 const { payments, taxations } = require("../config/dbconfig.provider");
 const AccountService = require('../accounts/account.service');
-const checkAccountStatus = require("../Helpers/checkAccountStatus");
-const TaxationService = require("../taxation/taxation.service");
 
 const PaymentService = {}
 
@@ -15,7 +13,7 @@ PaymentService.create = async (data) => {
         return { status: 400, data: [], message: "Invalid amount" };
     }
     try {
-        let closing = await checkAccountStatus(data.accountUUID);
+        let closing = await AccountService.checkAccount(data.accountUUID);
         if (closing == false) {
             return { status: 401, message: "Ce compte n'existe pas dans le système ou il a été désactivé", data: [] };
         }

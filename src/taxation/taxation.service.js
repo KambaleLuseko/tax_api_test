@@ -14,10 +14,10 @@ TaxationService.findAll = async (value) => {
     }
     let taxationsData = await taxations.findAll(value ? { where: condition } : {});
     for (let index = 0; index < taxationsData.length; index++) {
-        let clients = await ClientService.findAll(taxationsData[index].dataValues.client_uuid);
+        let clients = await ClientService.findOne(taxationsData[index].dataValues.client_uuid);
         // let payments = await PaymentService.findAll(taxationsData[index].dataValues.uuid);
         // taxationsData[index].dataValues.payments = payments;
-        taxationsData[index].dataValues.client = clients[0];
+        taxationsData[index].dataValues.client = clients;
         // taxationsData[index].dataValues.taxes = await ClientTaxService.findAll(taxationsData[index].dataValues.uuid);
     }
     return taxationsData;
@@ -68,9 +68,9 @@ TaxationService.findOne = async (uuid) => {
     }
     let taxationsData = await taxations.findOne({ where: { uuid: uuid } });
     if (taxationsData) {
-        let clients = await ClientService.findAll(taxationsData.dataValues.client_uuid);
+        let clients = await ClientService.findOne(taxationsData.dataValues.client_uuid);
         let payments = await PaymentService.findAll(taxationsData.dataValues.uuid);
-        taxationsData.dataValues.client = clients[0];
+        taxationsData.dataValues.client = clients;
         taxationsData.dataValues.taxes = await ClientTaxService.findAll(taxationsData.dataValues.uuid);
         taxationsData.dataValues.payments = payments;
     }
@@ -176,8 +176,6 @@ TaxationService.sync = async (data) => {
         let taxes = data[index].taxes;
         let payments = data[index].payments ?? [];
         for (let taxIndex = 0; taxIndex < taxes.length; taxIndex++) {
-            var someDate = new Date();
-            var newDueDate = someDate.setDate(someDate.getDate() + 30);
             if (!taxes[taxIndex].taxe_id || !taxes[taxIndex].amountPaid) {
                 hasErrors = true;
                 continue;

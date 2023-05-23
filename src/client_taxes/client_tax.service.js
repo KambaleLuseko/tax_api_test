@@ -14,11 +14,9 @@ ClientTaxService.findAll = async (value) => {
     }
     let data = await clients_taxes.findAll(value ? { where: condition } : {});
     for (let index = 0; index < data.length; index++) {
-        let taxe = await TaxService.findAll(data[index].dataValues.taxe_uuid);
-        // let paidTaxeInfo = await InfoTaxePaymentService.findAll(data[index].dataValues.uuid);
-        // data[index].dataValues.taxeInfo = paidTaxeInfo;
-        data[index].dataValues.taxName = taxe[0].name;
-        data[index].dataValues.taxDescription = taxe[0].description;
+        let taxe = await TaxService.findOne(data[index].dataValues.taxe_id);
+        data[index].dataValues.taxName = taxe?.name;
+        data[index].dataValues.taxDescription = taxe?.description;
     }
     return data;
 }

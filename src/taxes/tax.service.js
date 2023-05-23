@@ -22,6 +22,14 @@ TaxService.findAll = async (value, getSpecs = true) => {
     return data;
 }
 
+TaxService.findOne = async (value) => {
+    if (!value) {
+        return {};
+    }
+    let data = await taxes.findOne({ where: { id: value } });
+    return data;
+}
+
 TaxService.create = async (data) => {
     if (!data.division_id || !data.name || !data.cycle || !data.periode) {
         return { status: 400, data: [], message: "Invalid data submitted" };
