@@ -182,25 +182,25 @@ TaxationService.sync = async (data) => {
             }
             taxesToSave.push({
                 taxation_uuid: uuid,
-                taxe_id: taxes[index].taxe_id,
-                amountPaid: taxes[index].amountPaid,
-                nextPayment: taxes[index].nextPayment,
-                recoveryDate: taxes[index].recoveryDate,
-                status: taxes[index].status || 'Pending',
+                taxe_id: taxes[taxIndex].taxe_id,
+                amountPaid: taxes[taxIndex].amountPaid,
+                nextPayment: taxes[taxIndex].nextPayment,
+                recoveryDate: taxes[taxIndex].recoveryDate,
+                status: taxes[taxIndex].status || 'Pending',
                 // inputsData: taxes[index].inputsData
             });
         }
-        for (let index = 0; index < payments.length; index++) {
-            if (!payments[index].totalAmount || !payments[index].type) {
+        for (let paymentIndex = 0; paymentIndex < payments.length; paymentIndex++) {
+            if (!payments[paymentIndex].totalAmount || !payments[paymentIndex].type) {
                 hasErrors = true;
                 continue;
             }
             savePayments.push({
-                uuid: payments[index].uuid ?? uuidGenerator(),
+                uuid: payments[paymentIndex].uuid ?? uuidGenerator(),
                 taxation_uuid: uuid,
-                totalAmount: payments[index].totalAmount,
-                type: payments[index].type,
-                accountUUID: data[index].accountUUID,
+                totalAmount: payments[paymentIndex].totalAmount,
+                type: payments[paymentIndex].type,
+                accountUUID: data[paymentIndex].accountUUID,
             });
         }
     }
