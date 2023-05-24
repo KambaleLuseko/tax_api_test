@@ -186,7 +186,7 @@ ClosingService.getClosingData = async (date, accountUUID) => {
 
 ClosingService.checkAccountClosing = async (accountUUID) => {
 
-    let closing = await closings.findAll({ where: { status: "pending", sender_account_uuid: accountUUID } });
+    let closing = await closings.findAll({ where: { [Op.or]: { status: "pending", status: "ongoing" }, sender_account_uuid: accountUUID } });
     if (closing.length > 0) {
         return true;
     }
