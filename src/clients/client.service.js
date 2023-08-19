@@ -103,7 +103,7 @@ ClientService.sync = async (data) => {
         if (!client.fullname || !client.phone) {
             hasErrors = true;
         }
-        let checkDuplication = await clients.findAll({ where: { [Op.or]: { fullname: data.fullname, phone: data.phone } } });
+        let checkDuplication = await clients.findAll({ where: { [Op.or]: { fullname: client.fullname, phone: client.phone } } });
         if (checkDuplication.length > 0) {
             hasErrors = true;
             continue;

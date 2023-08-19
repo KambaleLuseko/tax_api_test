@@ -34,6 +34,7 @@ database.accounts = require('../accounts/account.model')(connexion, Sequelize);
 database.expenseCategories = require('../expense_category/expense_category.model')(connexion, Sequelize);
 database.expenses = require('../expenses/expense.model')(connexion, Sequelize);
 database.closings = require('../closing/closing.model')(connexion, Sequelize);
+database.radius_groups = require('../radius_group/radius_group.model')(connexion, Sequelize);
 database.overdueFees = require('../overduesFees/overdue_fees.model')(connexion, Sequelize);
 database.recoveries = require('../recovery/recovery.model')(connexion, Sequelize);
 
